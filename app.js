@@ -57,9 +57,11 @@ var UIController = (function() {
         inputType : '.add__type',
         inputDescription : '.add__description',
         inputValue : '.add__value',
-        addBtn : '.add__btn'
+        addBtn : '.add__btn',
+        incomeContainer : '.income__list',
+        expensesContainer : '.expenses__list'
     };
-    // 1. Get field input data
+    
     return {
         getDOMStrings : function() {
             return DOMStrings;
@@ -71,12 +73,29 @@ var UIController = (function() {
                 description : document.querySelector(DOMStrings.inputDescription).value,
                 value : document.querySelector(DOMStrings.inputValue).value
             };
+        },
+
+        addListItem : function(obj, type) {
+            var html, newHtml, element;
+            //create html string with placeholder text
+            if(type === 'inc') {
+                element = DOMStrings.incomeContainer;
+                html = '<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+            } else if(type === 'exp') {
+                element = DOMStrings.expensesContainer;
+                html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+            }
+
+            //replace placeholder with actual text
+            newHtml = html.replace('%id%', obj.id);
+            newHtml = newHtml.replace('%description%', obj.description);
+            newHtml = newHtml.replace('%value%', obj.value);
+
+            //insert html into dom
+            document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
         }
     }
-    // 2. Add item to budget controller
-    // 3. Add item to UI
-    // 4. Calculate budget
-    // 5. Display budget on the UI
+    
 })();
 
 var controller = (function(budgetCtrl, UICtrl) {
@@ -95,9 +114,16 @@ var controller = (function(budgetCtrl, UICtrl) {
 
     var ctrlAddItem = function() {
         var newItem;
+        // 1. Get field input data
         var inputFields = UICtrl.getInput();
+        // 2. Add item to budget controller
         newItem = budgetCtrl.addItem(inputFields.type, inputFields.description, inputFields.value);
         //console.log(inputFields);
+        // 3. Add item to UI
+        UICtrl.addListItem(newItem, inputFields.type);
+        // 4. Calculate budget
+
+        // 5. Display budget on the UI
     };
 
     return {
